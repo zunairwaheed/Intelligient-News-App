@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity, StyleSheet,
   KeyboardAvoidingView, Platform, ScrollView, Alert,
-  SafeAreaView, ActivityIndicator,
+  SafeAreaView, ActivityIndicator, Image,
 } from 'react-native';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
@@ -88,7 +88,11 @@ export default function LoginScreen({ navigation, route }) {
         >
           <View style={styles.header}>
             <View style={styles.logoContainer}>
-              <Ionicons name="newspaper" size={40} color="#fff" />
+              <Image 
+                source={require('../../../assets/icon.png')} 
+                style={styles.logoImage} 
+                resizeMode="contain"
+              />
             </View>
             <Text style={styles.appName}>Intelligent News App</Text>
             <Text style={styles.tagline}>Welcome back to your community</Text>
@@ -226,11 +230,13 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     width: 60, height: 60, borderRadius: 18,
-    backgroundColor: 'rgba(255,255,255,0.2)',
+    backgroundColor: '#fff',
     justifyContent: 'center', alignItems: 'center',
     marginBottom: 12,
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)',
+    elevation: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4,
+    overflow: 'hidden',
   },
+  logoImage: { width: 60, height: 60 },
   appName: { fontSize: 24, fontWeight: '800', color: '#fff', letterSpacing: 0.5 },
   tagline: { fontSize: 13, color: 'rgba(255,255,255,0.8)', marginTop: 4 },
   card: {

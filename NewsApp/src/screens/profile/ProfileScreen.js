@@ -35,13 +35,23 @@ export default function ProfileScreen({ navigation }) {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [updatingPassword, setUpdatingPassword] = useState(false);
-  
+
   // Password Visibility States
   const [showOldPass, setShowOldPass] = useState(false);
   const [showNewPass, setShowNewPass] = useState(false);
   const [showConfirmPass, setShowConfirmPass] = useState(false);
 
+  const fetchUserProfile = async () => {
+    try {
+      const res = await api.get('/api/auth/profile/');
+      await updateUser(res.data);
+    } catch {
+      // ignore
+    }
+  };
+
   useFocusEffect(useCallback(() => {
+    fetchUserProfile();
     fetchMySubmissions();
   }, []));
 
@@ -60,10 +70,12 @@ export default function ProfileScreen({ navigation }) {
   const handleLogout = () => {
     Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
       { text: 'Cancel', style: 'cancel' },
-      { text: 'Sign Out', style: 'destructive', onPress: async () => {
-        await logout();
-        navigation.navigate('Login');
-      } },
+      {
+        text: 'Sign Out', style: 'destructive', onPress: async () => {
+          await logout();
+          navigation.navigate('Login');
+        }
+      },
     ]);
   };
 
@@ -127,26 +139,28 @@ export default function ProfileScreen({ navigation }) {
   const handleDeleteSubmission = (id) => {
     Alert.alert('Delete News', 'Are you sure you want to delete this submission?', [
       { text: 'Cancel', style: 'cancel' },
-      { text: 'Delete', style: 'destructive', onPress: async () => {
-        try {
-          await api.delete(`/api/news/delete/${id}/`);
-          fetchMySubmissions();
-        } catch (err) {
-          Alert.alert('Error', 'Failed to delete news.');
+      {
+        text: 'Delete', style: 'destructive', onPress: async () => {
+          try {
+            await api.delete(`/api/news/delete/${id}/`);
+            fetchMySubmissions();
+          } catch (err) {
+            Alert.alert('Error', 'Failed to delete news.');
+          }
         }
-      } },
+      },
     ]);
   };
 
   const renderSubmission = ({ item }) => {
     const s = STATUS_COLORS[item.status] || STATUS_COLORS.pending;
     return (
-      <TouchableOpacity 
+      <TouchableOpacity
         style={styles.submissionCard}
-        onPress={() => item.status === 'approved' && navigation.navigate('NewsDetail', { 
-          item, 
-          isCommunity: true, 
-          userCountry: user?.country_code 
+        onPress={() => item.status === 'approved' && navigation.navigate('NewsDetail', {
+          item,
+          isCommunity: true,
+          userCountry: user?.country_code
         })}
       >
         <View style={styles.submissionHeader}>
@@ -188,10 +202,18 @@ export default function ProfileScreen({ navigation }) {
           <View style={styles.mainInfo}>
             <Text style={styles.userNameLarge}>{user?.username}</Text>
             <Text style={styles.userEmailLarge}>{user?.email}</Text>
-            {user?.city && (
+            {(user?.city || user?.country_code) ? (
               <View style={styles.locationBadge}>
                 <Ionicons name="location" size={12} color="#fff" />
-                <Text style={styles.locationBadgeText}>{user.city}, {user.country_code?.toUpperCase()}</Text>
+                <Text style={styles.locationBadgeText}>
+                  {user.city || 'Unknown'}
+                  {user?.country_code ? `, ${user.country_code.toUpperCase()}` : ''}
+                </Text>
+              </View>
+            ) : (
+              <View style={[styles.locationBadge, { backgroundColor: '#eff6ff' }]}>
+                <Ionicons name="location-outline" size={12} color="#1a73e8" />
+                <Text style={[styles.locationBadgeText, { color: '#1a73e8' }]}>Location not set</Text>
               </View>
             )}
           </View>
@@ -206,7 +228,7 @@ export default function ProfileScreen({ navigation }) {
       {/* Settings Sections */}
       <View style={styles.settingsSection}>
         <Text style={styles.settingsGroupTitle}>Account Settings</Text>
-        
+
         <TouchableOpacity style={styles.settingItem} onPress={() => {
           setEditUsername(user?.username || '');
           setEditBio(user?.bio || '');
@@ -250,7 +272,7 @@ export default function ProfileScreen({ navigation }) {
       </View>
 
       <View style={styles.sectionDivider} />
-      
+
       <View style={styles.sectionHeader}>
         <Text style={styles.sectionTitle}>My Submissions</Text>
         <Text style={styles.sectionCount}>{submissions.length} articles</Text>
@@ -294,14 +316,14 @@ export default function ProfileScreen({ navigation }) {
             <ScrollView style={styles.modalBody} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
               <Text style={styles.inputLabel}>Username</Text>
               <TextInput style={styles.input} value={editUsername} onChangeText={setEditUsername} placeholder="Username" />
-              
+
               <Text style={styles.inputLabel}>Bio</Text>
-              <TextInput 
-                style={[styles.input, { height: 80, textAlignVertical: 'top' }]} 
-                value={editBio} 
-                onChangeText={setEditBio} 
-                placeholder="Tell us about yourself..." 
-                multiline 
+              <TextInput
+                style={[styles.input, { height: 80, textAlignVertical: 'top' }]}
+                value={editBio}
+                onChangeText={setEditBio}
+                placeholder="Tell us about yourself..."
+                multiline
               />
 
               <Text style={styles.inputLabel}>Phone Number</Text>
@@ -340,17 +362,17 @@ export default function ProfileScreen({ navigation }) {
                 <Ionicons name="close" size={24} color="#333" />
               </TouchableOpacity>
             </View>
-            
+
             <ScrollView style={styles.modalBodyScroll} showsVerticalScrollIndicator={false}>
               <View style={styles.modalBodyInternal}>
                 <Text style={styles.inputLabel}>Current Password</Text>
                 <View style={styles.passwordInputContainer}>
-                  <TextInput 
-                    style={styles.passwordInput} 
+                  <TextInput
+                    style={styles.passwordInput}
                     secureTextEntry={!showOldPass}
-                    value={oldPassword} 
-                    onChangeText={setOldPassword} 
-                    placeholder="Enter current password" 
+                    value={oldPassword}
+                    onChangeText={setOldPassword}
+                    placeholder="Enter current password"
                   />
                   <TouchableOpacity onPress={() => setShowOldPass(!showOldPass)} style={styles.eyeBtn}>
                     <Ionicons name={showOldPass ? 'eye-off-outline' : 'eye-outline'} size={20} color="#666" />
@@ -359,12 +381,12 @@ export default function ProfileScreen({ navigation }) {
 
                 <Text style={styles.inputLabel}>New Password</Text>
                 <View style={styles.passwordInputContainer}>
-                  <TextInput 
-                    style={styles.passwordInput} 
+                  <TextInput
+                    style={styles.passwordInput}
                     secureTextEntry={!showNewPass}
-                    value={newPassword} 
-                    onChangeText={setNewPassword} 
-                    placeholder="Enter new password" 
+                    value={newPassword}
+                    onChangeText={setNewPassword}
+                    placeholder="Enter new password"
                   />
                   <TouchableOpacity onPress={() => setShowNewPass(!showNewPass)} style={styles.eyeBtn}>
                     <Ionicons name={showNewPass ? 'eye-off-outline' : 'eye-outline'} size={20} color="#666" />
@@ -373,12 +395,12 @@ export default function ProfileScreen({ navigation }) {
 
                 <Text style={styles.inputLabel}>Confirm New Password</Text>
                 <View style={styles.passwordInputContainer}>
-                  <TextInput 
-                    style={styles.passwordInput} 
+                  <TextInput
+                    style={styles.passwordInput}
                     secureTextEntry={!showConfirmPass}
-                    value={confirmPassword} 
-                    onChangeText={setConfirmPassword} 
-                    placeholder="Confirm new password" 
+                    value={confirmPassword}
+                    onChangeText={setConfirmPassword}
+                    placeholder="Confirm new password"
                   />
                   <TouchableOpacity onPress={() => setShowConfirmPass(!showConfirmPass)} style={styles.eyeBtn}>
                     <Ionicons name={showConfirmPass ? 'eye-off-outline' : 'eye-outline'} size={20} color="#666" />
@@ -396,8 +418,8 @@ export default function ProfileScreen({ navigation }) {
               <TouchableOpacity style={styles.cancelBtn} onPress={() => setShowPasswordModal(false)}>
                 <Text style={styles.cancelBtnText}>Cancel</Text>
               </TouchableOpacity>
-              <TouchableOpacity 
-                style={[styles.saveBtn, updatingPassword && { opacity: 0.7 }]} 
+              <TouchableOpacity
+                style={[styles.saveBtn, updatingPassword && { opacity: 0.7 }]}
                 onPress={handleChangePassword}
                 disabled={updatingPassword}
               >

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity, StyleSheet,
   KeyboardAvoidingView, Platform, ScrollView, Alert,
-  SafeAreaView, ActivityIndicator,
+  SafeAreaView, ActivityIndicator, Image,
 } from 'react-native';
 import { useAuth } from '../../context/AuthContext';
 import { Ionicons } from '@expo/vector-icons';
@@ -87,63 +87,67 @@ export default function SignupScreen({ navigation, route }) {
 
   return (
     <SafeAreaView style={styles.safe}>
-      <KeyboardAvoidingView 
-        style={styles.flex} 
+      <KeyboardAvoidingView
+        style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
       >
-        <ScrollView 
-          contentContainerStyle={styles.scroll} 
-          keyboardShouldPersistTaps="handled" 
+        <ScrollView
+          contentContainerStyle={styles.scroll}
+          keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.header}>
             <View style={styles.logoContainer}>
-              <Ionicons name="newspaper" size={40} color="#fff" />
+              <Image
+                source={require('../../../assets/icon.png')}
+                style={styles.logoImage}
+                resizeMode="contain"
+              />
             </View>
             <Text style={styles.appName}>Intelligent News App</Text>
             <Text style={styles.tagline}>Join our global news community</Text>
           </View>
-  
+
           <View style={styles.card}>
             <Text style={styles.title}>Create Account</Text>
             <Text style={styles.subtitle}>Enter your details to get started</Text>
-  
+
             <View style={styles.form}>
-              <Field 
-                label="Username" 
-                placeholder="Choose a username" 
-                value={form.username} 
-                onChangeText={set('username')} 
+              <Field
+                label="Username"
+                placeholder="Choose a username"
+                value={form.username}
+                onChangeText={set('username')}
                 icon="person-outline"
               />
-              <Field 
-                label="Email" 
-                placeholder="you@example.com" 
-                keyboard="email-address" 
-                value={form.email} 
-                onChangeText={set('email')} 
+              <Field
+                label="Email"
+                placeholder="you@example.com"
+                keyboard="email-address"
+                value={form.email}
+                onChangeText={set('email')}
                 icon="mail-outline"
               />
-              <Field 
-                label="Phone (optional)" 
-                placeholder="+1 234 567 8900" 
-                keyboard="phone-pad" 
-                value={form.phone} 
-                onChangeText={set('phone')} 
+              <Field
+                label="Phone (optional)"
+                placeholder="+1 234 567 8900"
+                keyboard="phone-pad"
+                value={form.phone}
+                onChangeText={set('phone')}
                 icon="call-outline"
               />
-              <Field 
-                label="Password" 
-                placeholder="Min. 8 characters" 
-                secure 
-                showPass={showPass} 
+              <Field
+                label="Password"
+                placeholder="Min. 8 characters"
+                secure
+                showPass={showPass}
                 onToggleShow={() => setShowPass(!showPass)}
-                value={form.password} 
-                onChangeText={set('password')} 
+                value={form.password}
+                onChangeText={set('password')}
                 icon="lock-closed-outline"
               />
-  
+
               <Text style={styles.label}>Confirm Password</Text>
               <View style={styles.inputWrapper}>
                 <Ionicons name="lock-closed-outline" size={18} color="#1a73e8" style={styles.inputIcon} />
@@ -160,7 +164,7 @@ export default function SignupScreen({ navigation, route }) {
                 </TouchableOpacity>
               </View>
             </View>
-  
+
             <TouchableOpacity
               style={[styles.btn, loading && styles.btnDisabled]}
               onPress={handleSignup}
@@ -172,14 +176,14 @@ export default function SignupScreen({ navigation, route }) {
                 <Text style={styles.btnText}>Create Account</Text>
               )}
             </TouchableOpacity>
-  
-            <TouchableOpacity 
-              style={styles.homeBtn} 
+
+            <TouchableOpacity
+              style={styles.homeBtn}
               onPress={() => navigation.navigate('Tabs', { screen: 'Home' })}
             >
               <Text style={styles.homeBtnText}>Explore as Guest</Text>
             </TouchableOpacity>
-  
+
             <View style={styles.footer}>
               <Text style={styles.footerText}>Already have an account? </Text>
               <TouchableOpacity onPress={() => navigation.navigate('Login', { redirectTo })}>
@@ -197,25 +201,27 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: '#1a73e8' },
   flex: { flex: 1 },
   scroll: { flexGrow: 1, paddingBottom: 40 },
-  header: { 
-    alignItems: 'center', 
-    paddingTop: 40, 
+  header: {
+    alignItems: 'center',
+    paddingTop: 40,
     paddingBottom: 20,
     backgroundColor: '#1a73e8',
   },
   logoContainer: {
-    width: 60, height: 60, borderRadius: 18, 
-    backgroundColor: 'rgba(255,255,255,0.2)',
+    width: 60, height: 60, borderRadius: 18,
+    backgroundColor: '#fff',
     justifyContent: 'center', alignItems: 'center',
     marginBottom: 12,
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)',
+    elevation: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4,
+    overflow: 'hidden',
   },
+  logoImage: { width: 60, height: 60 },
   appName: { fontSize: 24, fontWeight: '800', color: '#fff', letterSpacing: 0.5 },
   tagline: { fontSize: 13, color: 'rgba(255,255,255,0.8)', marginTop: 4 },
   card: {
     flex: 1,
-    backgroundColor: '#fff', 
-    borderTopLeftRadius: 36, 
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 36,
     borderTopRightRadius: 36,
     paddingHorizontal: 24,
     paddingTop: 24,
@@ -228,7 +234,7 @@ const styles = StyleSheet.create({
   label: { fontSize: 11, fontWeight: '800', color: '#666', marginBottom: 6, textTransform: 'uppercase', letterSpacing: 0.8 },
   inputWrapper: {
     flexDirection: 'row', alignItems: 'center',
-    backgroundColor: '#f8f9fe', 
+    backgroundColor: '#f8f9fe',
     borderWidth: 1, borderColor: '#edf2f7', borderRadius: 10,
     marginBottom: 12, paddingHorizontal: 12,
   },
@@ -248,9 +254,9 @@ const styles = StyleSheet.create({
   btnText: { color: '#fff', fontSize: 15, fontWeight: '800', letterSpacing: 0.5 },
   homeBtn: { marginTop: 12, paddingVertical: 8, alignItems: 'center' },
   homeBtnText: { color: '#1a73e8', fontSize: 13, fontWeight: '700' },
-  footer: { 
-    flexDirection: 'row', justifyContent: 'center', alignItems: 'center', 
-    marginTop: 20, paddingBottom: 20 
+  footer: {
+    flexDirection: 'row', justifyContent: 'center', alignItems: 'center',
+    marginTop: 20, paddingBottom: 20
   },
   footerText: { color: '#777', fontSize: 13 },
   linkBold: { color: '#1a73e8', fontWeight: '800' },

@@ -87,7 +87,7 @@ export default function AppNavigator() {
   const { loading } = useAuth();
 
   if (loading) {
-    return <View style={{ flex: 1, backgroundColor: '#fff' }} />;
+    return <View style={{ flex: 1, backgroundColor: '#050a14' }} />;
   }
 
   return (

@@ -15,6 +15,7 @@ import { useAuth } from '../../context/AuthContext';
 
 const TABS = ['Latest', 'Community'];
 const CATEGORIES = ['All', 'Business', 'Entertainment', 'Health', 'Science', 'Sports', 'Technology', 'Top', 'World'];
+const SUGGESTED_CHANNELS = ['bbc.co.uk', 'cnn.com', 'reuters.com', 'aljazeera.com', 'theguardian.com', 'nytimes.com', 'bloomberg.com', 'techcrunch.com'];
 const HEADER_MAX_HEIGHT = 330;
 
 // Memoized NewsCard for performance
@@ -479,6 +480,20 @@ export default function HomeScreen({ navigation, route }) {
             <ScrollView style={styles.modalBody} showsVerticalScrollIndicator={false}>
               <Text style={styles.filterLabel}>News Channel (Domain)</Text>
               <TextInput style={styles.filterInput} placeholder="e.g. bbc.co.uk" value={draftDomain} onChangeText={setDraftDomain} autoCapitalize="none" />
+              
+              <View style={styles.suggestedChannelsWrapper}>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.suggestedChannelsScroll}>
+                  {[...new Set([...availableChannels, ...SUGGESTED_CHANNELS])].map((ch) => (
+                    <TouchableOpacity 
+                      key={ch} 
+                      style={[styles.channelChip, draftDomain === ch && styles.channelChipActive]} 
+                      onPress={() => setDraftDomain(ch)}
+                    >
+                      <Text style={[styles.channelChipText, draftDomain === ch && styles.channelChipTextActive]}>{ch}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
               <Text style={styles.filterLabel}>Date & Time</Text>
               <View style={styles.filterOptions}>
                 {['', '24', '48', '7d'].map((tf) => (
@@ -571,4 +586,10 @@ const styles = StyleSheet.create({
   suggestionLoadingText: { marginLeft: 10, color: '#666' },
   suggestionEmpty: { padding: 20, alignItems: 'center' },
   suggestionEmptyText: { color: '#999' },
+  suggestedChannelsWrapper: { marginBottom: 20, marginTop: -10 },
+  suggestedChannelsScroll: { paddingVertical: 5 },
+  channelChip: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 16, backgroundColor: '#f0f4f8', marginRight: 8, borderWidth: 1, borderColor: '#d1d9e6' },
+  channelChipActive: { backgroundColor: '#1a73e8', borderColor: '#1a73e8' },
+  channelChipText: { fontSize: 12, color: '#555' },
+  channelChipTextActive: { color: '#fff', fontWeight: '600' },
 });
